@@ -3,6 +3,7 @@ package graficos;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
@@ -13,20 +14,20 @@ public class Games extends Canvas implements Runnable {
 	private Thread thread;
 	public static JFrame frame;
 	private boolean isRunning = true;
-	private final int WIDTH = 160;
-	private final int HEIGTH = 120;
+	private final int WIDTH = 240;
+	private final int HEIGTH = 160;
 	private final int SCALE = 3;
-	
+
 	private BufferedImage image;
-	
-	public Games()	{
+
+	public Games() {
 		setPreferredSize(new Dimension(WIDTH * SCALE, HEIGTH * SCALE));
 		initFrame();
 		image = new BufferedImage(WIDTH, HEIGTH, BufferedImage.TYPE_INT_RGB);
 
 	}
-	
-	public void initFrame( ) {
+
+	public void initFrame() {
 		frame = new JFrame("Game#1");
 		frame.add(this);
 		frame.setResizable(false);
@@ -35,13 +36,13 @@ public class Games extends Canvas implements Runnable {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 	}
-	
-	public synchronized void start()	{
+
+	public synchronized void start() {
 		thread = new Thread(this);
 		isRunning = true;
 		thread.start();
 	}
-	
+
 	public synchronized void stop() {
 		isRunning = false;
 		try {
@@ -50,16 +51,17 @@ public class Games extends Canvas implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		Games game = new Games();
 		game.start();
-		
+
 	}
-	
+
 	public void update() {
-		
+
 	}
+
 	public void render() {
 		BufferStrategy bs = this.getBufferStrategy();
 		if (bs == null) {
@@ -67,12 +69,21 @@ public class Games extends Canvas implements Runnable {
 			return;
 		}
 		Graphics g = image.getGraphics();
-		g.setColor(new Color(250,0,0));
-		g.fillRect(0, 0, WIDTH, HEIGTH);
+
+		// Desenhar formas na tela (Estudar mais sobre Graphics)
+		// g.setColor(new Color(19,19,19));
+		// g.fillRect(0, 0, WIDTH, HEIGTH);
+		
+		//Para criar String no grafico, estudar mais sobre isso também
+		g.setColor(new Color(0,0,0));
+		g.setFont(new Font("Arial", Font.BOLD, 15));
+		g.setColor(Color.WHITE);
+		g.drawString("Em breve ... XXY: O jogo", 19, 19);
 		g = bs.getDrawGraphics();
 		g.drawImage(image, 0, 0, WIDTH * SCALE, HEIGTH * SCALE, null);
 		bs.show();
 	}
+
 	@Override
 	public void run() {
 		long lastTime = System.nanoTime();
@@ -80,28 +91,27 @@ public class Games extends Canvas implements Runnable {
 		final double ns = 1000000000 / amoutOfTicks;
 		double delta = 0;
 		int frames = 0;
-		double timer = System.currentTimeMillis();		
-		while(isRunning) {
+		double timer = System.currentTimeMillis();
+		while (isRunning) {
 			long now = System.nanoTime();
 			delta += (now - lastTime) / ns;
 			lastTime = now;
-			if(delta >= 1) {
+			if (delta >= 1) {
 				update();
 				render();
 				frames++;
 				delta--;
 			}
-			
-			if(System.currentTimeMillis() - timer >= 1000) {
+
+			if (System.currentTimeMillis() - timer >= 1000) {
 				System.out.println("FPS: " + frames);
 				frames = 0;
 				timer += 1000;
 			}
-			
-			stop();
-			
+
 		}
-		
+
+		stop();
 	}
 
 }
